@@ -24,7 +24,7 @@ import {
   Activity
 } from "lucide-react";
 
-const NEXUS_CONTRACT = "0xe3791566EB7A029990D100ACfE477a9985948E8E" as const;
+const NEXUS_CONTRACT = "0x4730d6aDD549Cf6390B9BaAb664F1cED6d8d0182" as const;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface CampaignData {
@@ -36,6 +36,7 @@ interface CampaignData {
   rewardPerAction: bigint;
   metadataUri: string;
   validator: `0x${string}`;
+  targetContract: `0x${string}`;
   startTime: bigint;
   endTime: bigint;
   maxClaims: number;
@@ -266,6 +267,7 @@ export default function AdminPage() {
           bigint,         // rewardPerAction
           string,         // metadataUri
           `0x${string}`, // validator
+          `0x${string}`, // targetContract
           bigint,         // startTime
           bigint,         // endTime
           number,         // maxClaims
@@ -281,11 +283,12 @@ export default function AdminPage() {
           rewardPerAction: r[4],
           metadataUri: r[5],
           validator: r[6],
-          startTime: r[7],
-          endTime: r[8],
-          maxClaims: r[9],
-          claimCount: r[10],
-          isActive: r[11],
+          targetContract: r[7],
+          startTime: r[8],
+          endTime: r[9],
+          maxClaims: r[10],
+          claimCount: r[11],
+          isActive: r[12],
         } satisfies CampaignData;
       })
       .filter((c): c is CampaignData => c !== null && c.creator.toLowerCase() === address.toLowerCase());

@@ -51,6 +51,11 @@ export const NexusAbi = [
         "internalType": "address"
       },
       {
+        "name": "targetContract",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
         "name": "startTime",
         "type": "uint64",
         "internalType": "uint64"
@@ -159,6 +164,11 @@ export const NexusAbi = [
       },
       {
         "name": "_validator",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "_targetContract",
         "type": "address",
         "internalType": "address"
       },
@@ -362,6 +372,12 @@ export const NexusAbi = [
         "type": "uint32",
         "indexed": false,
         "internalType": "uint32"
+      },
+      {
+        "name": "targetContract",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
       }
     ],
     "anonymous": false

@@ -48,6 +48,7 @@ contract NexusTest is Test {
             10 * 10 ** 18,
             "0g://metadata-hash",
             validator,
+            address(this),
             uint64(block.timestamp),
             uint64(block.timestamp + 1 days),
             10
@@ -67,6 +68,7 @@ contract NexusTest is Test {
             10 * 10 ** 18,
             "0g://metadata-hash",
             validator,
+            address(this),
             uint64(block.timestamp),
             uint64(block.timestamp + 1 days),
             10
@@ -107,6 +109,7 @@ contract NexusTest is Test {
             10 * 10 ** 18,
             "0g://metadata-hash",
             validator,
+            address(this),
             uint64(block.timestamp),
             uint64(block.timestamp + 1 days),
             10
@@ -145,6 +148,7 @@ contract NexusTest is Test {
             10 * 10 ** 18,
             "0g://metadata-hash",
             validator,
+            address(this),
             uint64(block.timestamp + 1 hours), // Starts in 1 hour
             uint64(block.timestamp + 1 days),
             10
@@ -171,6 +175,7 @@ contract NexusTest is Test {
             10 * 10 ** 18,
             "0g://metadata-hash",
             validator,
+            address(this),
             uint64(block.timestamp - 2 hours),
             uint64(block.timestamp - 1 hours), // Ended 1 hour ago
             10
@@ -197,6 +202,7 @@ contract NexusTest is Test {
             10 * 10 ** 18,
             "0g://metadata-hash",
             validator,
+            address(this),
             uint64(block.timestamp),
             uint64(block.timestamp + 1 days),
             1 // Only 1 claim allowed
@@ -235,6 +241,7 @@ contract NexusTest is Test {
             10 * 10 ** 18,
             "0g://metadata-hash",
             validator,
+            address(this),
             uint64(block.timestamp),
             uint64(block.timestamp + 1 days),
             10
@@ -266,6 +273,7 @@ contract NexusTest is Test {
             10 * 10 ** 18,
             "0g://metadata-hash",
             validator,
+            address(this),
             uint64(block.timestamp),
             uint64(block.timestamp + 1 days),
             10

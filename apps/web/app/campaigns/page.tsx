@@ -25,7 +25,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 
-const NEXUS_CONTRACT = "0xe3791566EB7A029990D100ACfE477a9985948E8E" as const;
+const NEXUS_CONTRACT = "0x4730d6aDD549Cf6390B9BaAb664F1cED6d8d0182" as const;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface CampaignData {
@@ -37,6 +37,7 @@ interface CampaignData {
   rewardPerAction: bigint;
   metadataUri: string;
   validator: `0x${string}`;
+  targetContract: `0x${string}`;
   startTime: bigint;
   endTime: bigint;
   maxClaims: number;
@@ -145,7 +146,7 @@ function CampaignCard({
       : `${campaign.claimCount} / ${campaign.maxClaims}`;
 
   return (
-    <div className="group relative flex flex-col rounded-2xl border border-white/5 bg-zinc-900/30 backdrop-blur-md overflow-hidden hover:border-violet-500/30 hover:bg-zinc-900/50 transition-all duration-300 shadow-xl">
+    <Link href={`/campaigns/${id}`} className="block group relative flex flex-col rounded-2xl border border-white/5 bg-zinc-900/30 backdrop-blur-md overflow-hidden hover:border-violet-500/30 hover:bg-zinc-900/50 transition-all duration-300 shadow-xl">
       {/* Top glow on hover */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
@@ -263,7 +264,7 @@ function CampaignCard({
           </a>
         </div>
       )}
-    </div>
+    </Link>
   );
 }
 
@@ -320,7 +321,7 @@ function HorizontalCampaignCard({
       : `${campaign.claimCount} / ${campaign.maxClaims}`;
 
   return (
-    <div className="group relative flex flex-col md:flex-row items-center gap-6 rounded-2xl border border-white/5 bg-zinc-900/30 backdrop-blur-md overflow-hidden hover:border-violet-500/30 hover:bg-zinc-900/50 transition-all duration-300 shadow-xl p-5 md:p-6">
+    <Link href={`/campaigns/${id}`} className="block group relative flex flex-col md:flex-row items-center gap-6 rounded-2xl border border-white/5 bg-zinc-900/30 backdrop-blur-md overflow-hidden hover:border-violet-500/30 hover:bg-zinc-900/50 transition-all duration-300 shadow-xl p-5 md:p-6">
       {/* Top glow on hover */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
@@ -401,7 +402,7 @@ function HorizontalCampaignCard({
           </a>
         )}
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -456,6 +457,7 @@ export default function CampaignsPage() {
           bigint,         // rewardPerAction
           string,         // metadataUri
           `0x${string}`, // validator
+          `0x${string}`, // targetContract
           bigint,         // startTime
           bigint,         // endTime
           number,         // maxClaims
@@ -471,11 +473,12 @@ export default function CampaignsPage() {
           rewardPerAction: r[4],
           metadataUri: r[5],
           validator: r[6],
-          startTime: r[7],
-          endTime: r[8],
-          maxClaims: r[9],
-          claimCount: r[10],
-          isActive: r[11],
+          targetContract: r[7],
+          startTime: r[8],
+          endTime: r[9],
+          maxClaims: r[10],
+          claimCount: r[11],
+          isActive: r[12],
         } satisfies CampaignData;
       })
       .filter((c): c is CampaignData => c !== null);

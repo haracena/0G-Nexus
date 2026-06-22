@@ -17,13 +17,6 @@ import { toast } from "sonner";
 const CHAIN_ID = 16602;
 import { NexusAbi } from "@/lib/abis/NexusAbi";
 import { ERC20Abi } from "@/lib/abis/ERC20Abi";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
 import { WebPreview } from "@/components/ui/web-preview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,6 +92,7 @@ export default function Dashboard() {
     totalReward: "",
     rewardPerAction: "",
     validatorAddress: "",
+    targetContract: "",
     startTime: "",
     endTime: "",
     maxClaims: "",
@@ -312,7 +306,7 @@ export default function Dashboard() {
         tokenDecimals,
       );
 
-      const NEXUS_CONTRACT = "0xe3791566EB7A029990D100ACfE477a9985948E8E";
+      const NEXUS_CONTRACT = "0x4730d6aDD549Cf6390B9BaAb664F1cED6d8d0182";
 
       await writeContractAsync({
         address: campaignData.tokenAddress as `0x${string}`,
@@ -332,7 +326,9 @@ export default function Dashboard() {
           totalRewardParsed,
           rewardPerActionParsed,
           `0g://${data.dataHash}`,
-          address as `0x${string}`,
+          // Use Ponder Backend's Validator Address natively
+          "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" as `0x${string}`,
+          campaignData.targetContract as `0x${string}`,
           BigInt(startTimeUnix),
           BigInt(endTimeUnix),
           maxClaimsNum,
@@ -568,6 +564,31 @@ export default function Dashboard() {
                     className="bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:border-violet-500/50 focus:ring-violet-500/20 transition-all rounded-lg min-h-[90px] py-3 px-4 resize-none"
                   />
                 </div>
+                
+                {/* Target Contract Address */}
+                <div className="grid gap-2">
+                  <Label
+                    htmlFor="target-contract"
+                    className="text-zinc-300 font-medium"
+                  >
+                    Target Contract Address
+                  </Label>
+                  <div className="text-sm text-zinc-500 mb-1">
+                    The Smart Contract address where users will perform the action. Ponder will index events from this contract.
+                  </div>
+                  <Input
+                    id="target-contract"
+                    placeholder="0x..."
+                    value={campaignData.targetContract}
+                    onChange={(e) =>
+                      setCampaignData({
+                        ...campaignData,
+                        targetContract: e.target.value,
+                      })
+                    }
+                    className="bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:border-violet-500/50 focus:ring-violet-500/20 h-11 px-4"
+                  />
+                </div>
 
                 <div className="grid gap-2">
                   <Label
@@ -667,7 +688,7 @@ export default function Dashboard() {
                   <Select
                     value={campaignData.category}
                     onValueChange={(val) =>
-                      setCampaignData({ ...campaignData, category: val })
+                      setCampaignData({ ...campaignData, category: val || "DeFi" })
                     }
                   >
                     <SelectTrigger className="w-full bg-zinc-950 border-zinc-800 text-zinc-200 focus:border-violet-500/50 focus:ring-violet-500/20 h-11 px-4">

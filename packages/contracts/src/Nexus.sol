@@ -25,6 +25,7 @@ contract Nexus is ReentrancyGuard, Ownable {
         uint256 rewardPerAction;
         string metadataUri; // 0G Storage URI
         address validator; // Address authorized to sign claim tickets
+        address targetContract; // Contract where the action takes place
         uint64 startTime;
         uint64 endTime; // 0 for no end time
         uint32 maxClaims; // 0 for no limit
@@ -49,7 +50,8 @@ contract Nexus is ReentrancyGuard, Ownable {
         address validator,
         uint64 startTime,
         uint64 endTime,
-        uint32 maxClaims
+        uint32 maxClaims,
+        address indexed targetContract
     );
 
     event RewardClaimed(
@@ -73,6 +75,7 @@ contract Nexus is ReentrancyGuard, Ownable {
      * @param _rewardPerAction Tokens rewarded per verified action.
      * @param _metadataUri URI pointing to campaign details (stored on 0G).
      * @param _validator Address authorized to sign claim tickets.
+     * @param _targetContract Address of the contract where the user performs the action.
      * @param _startTime Timestamp when the campaign starts.
      * @param _endTime Timestamp when the campaign ends (0 for no end time).
      * @param _maxClaims Maximum number of claims (0 for no limit).
@@ -83,6 +86,7 @@ contract Nexus is ReentrancyGuard, Ownable {
         uint256 _rewardPerAction,
         string calldata _metadataUri,
         address _validator,
+        address _targetContract,
         uint64 _startTime,
         uint64 _endTime,
         uint32 _maxClaims
@@ -105,6 +109,7 @@ contract Nexus is ReentrancyGuard, Ownable {
             rewardPerAction: _rewardPerAction,
             metadataUri: _metadataUri,
             validator: _validator,
+            targetContract: _targetContract,
             startTime: _startTime,
             endTime: _endTime,
             maxClaims: _maxClaims,
@@ -124,7 +129,8 @@ contract Nexus is ReentrancyGuard, Ownable {
             _validator,
             _startTime,
             _endTime,
-            _maxClaims
+            _maxClaims,
+            _targetContract
         );
 
         return campaignId;

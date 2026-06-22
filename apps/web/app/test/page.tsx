@@ -2,19 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useAccount, useWriteContract, useSignMessage, useSwitchChain } from 'wagmi';
+import { useAccount, useWriteContract, useSignMessage, useSwitchChain, usePublicClient } from 'wagmi';
 import { parseUnits, keccak256, encodePacked, stringToHex } from 'viem';
 import { toast } from 'sonner';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Coins, CheckCircle, Ticket } from "lucide-react";
+import { ArrowLeft, Coins, CheckCircle, Ticket, Zap, Loader2 } from "lucide-react";
 import { ERC20Abi } from "@/lib/abis/ERC20Abi";
 import { NexusAbi } from "@/lib/abis/NexusAbi";
+import { TestQuestAbi } from "@/lib/abis/TestQuestAbi";
 
 const MOCK_TOKEN = "0xfaEc345B6d0F96a32330d7DdFe0eAE51dF46cbf1";
-const NEXUS_CONTRACT = "0xe3791566EB7A029990D100ACfE477a9985948E8E";
+const NEXUS_CONTRACT = "0x4730d6aDD549Cf6390B9BaAb664F1cED6d8d0182";
 const CHAIN_ID = 16602;
 
 export default function TestDashboard() {
@@ -22,10 +23,15 @@ export default function TestDashboard() {
   const { writeContractAsync } = useWriteContract();
   const { signMessageAsync } = useSignMessage();
   const { switchChainAsync } = useSwitchChain();
+  const publicClient = usePublicClient();
   
   const [mintStatus, setMintStatus] = useState("");
   const [claimStatus, setClaimStatus] = useState("");
   const [campaignId, setCampaignId] = useState("");
+
+  const [testQuestAddress, setTestQuestAddress] = useState("");
+  const [interactStatus, setInteractStatus] = useState("");
+  const [isInteractLoading, setIsInteractLoading] = useState(false);
 
   const handleMint = async () => {
     if (!address) {
@@ -126,6 +132,68 @@ export default function TestDashboard() {
     }
   };
 
+  const handleInteract = async (action: "stake" | "swap" | "mint") => {
+    if (!address) {
+      toast.error("Connect wallet first!");
+      return;
+    }
+    if (!testQuestAddress.startsWith("0x") || testQuestAddress.length !== 42) {
+      toast.error("Enter a valid TestQuest Contract Address!");
+      return;
+    }
+
+    setIsInteractLoading(true);
+    setInteractStatus(`Initiating ${action} on TestQuest...`);
+
+    try {
+      if (chainId !== CHAIN_ID) {
+        setInteractStatus("Switching network to 0G Newton Testnet...");
+        await switchChainAsync({ chainId: CHAIN_ID });
+      }
+
+      // 1. Interacción con TestQuest
+      let txHash;
+      if (action === "stake") {
+        txHash = await writeContractAsync({
+          address: testQuestAddress as `0x${string}`,
+          abi: TestQuestAbi,
+          functionName: "stake",
+          args: [parseUnits("10", 18)],
+        });
+      } else if (action === "swap") {
+        txHash = await writeContractAsync({
+          address: testQuestAddress as `0x${string}`,
+          abi: TestQuestAbi,
+          functionName: "swap",
+          args: [parseUnits("10", 18), parseUnits("9.9", 18)],
+        });
+      } else if (action === "mint") {
+        txHash = await writeContractAsync({
+          address: testQuestAddress as `0x${string}`,
+          abi: TestQuestAbi,
+          functionName: "mint",
+          args: [],
+        });
+      }
+
+      if (!txHash) throw new Error("Transaction hash not generated");
+      setInteractStatus(`Action sent. Waiting for receipt (TX: ${txHash.slice(0, 10)}...)...`);
+      
+      // 2. Esperar el recibo (Confirmación on-chain)
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash: txHash });
+      if (receipt?.status !== "success") {
+        throw new Error("TestQuest transaction failed on-chain.");
+      }
+
+      setInteractStatus(`Action confirmed on TestQuest! (TX: ${receipt.transactionHash})`);
+      toast.success("Interaction successful!");
+    } catch (e: any) {
+      setInteractStatus(`Error: ${e.shortMessage || e.message}`);
+    } finally {
+      setIsInteractLoading(false);
+    }
+  };
+
   return (
     <div className="relative min-h-screen bg-black text-white selection:bg-violet-500/30 overflow-hidden font-sans pb-24">
       {/* Background Decorative Gradients */}
@@ -207,6 +275,60 @@ export default function TestDashboard() {
                 </Button>
                 {claimStatus && <p className="mt-4 text-sm text-zinc-400 font-mono break-all">{claimStatus}</p>}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Card 3: Interact Flow */}
+          <Card className="border border-white/5 bg-zinc-900/30 backdrop-blur-md shadow-xl rounded-2xl">
+            <CardHeader className="border-b border-white/5 bg-zinc-900/10 px-6 py-5">
+              <CardTitle className="text-lg font-bold flex items-center gap-2 text-emerald-400">
+                <Zap className="size-4" /> 3. Interact with TestQuest
+              </CardTitle>
+              <CardDescription className="text-zinc-400 mt-1">
+                Simulate a real user interaction. Enter your deployed TestQuest address and execute an action to get a Transaction Hash.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6 grid gap-6">
+              <div className="grid gap-2">
+                <Label htmlFor="testquest-address" className="text-zinc-300 font-medium">TestQuest Contract Address</Label>
+                <Input 
+                  id="testquest-address"
+                  type="text"
+                  placeholder="0x..."
+                  value={testQuestAddress}
+                  onChange={(e) => setTestQuestAddress(e.target.value)}
+                  className="bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 h-11"
+                />
+              </div>
+              <div className="flex flex-wrap gap-4 items-center">
+                <Button 
+                  onClick={() => handleInteract("stake")} 
+                  disabled={isInteractLoading}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl h-11 px-8 transition-all"
+                >
+                  Stake 10 Tokens
+                </Button>
+                <Button 
+                  onClick={() => handleInteract("swap")} 
+                  disabled={isInteractLoading}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl h-11 px-8 transition-all"
+                >
+                  Swap 10 Tokens
+                </Button>
+                <Button 
+                  onClick={() => handleInteract("mint")} 
+                  disabled={isInteractLoading}
+                  className="bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-xl h-11 px-8 transition-all"
+                >
+                  Mint NFT
+                </Button>
+              </div>
+              {interactStatus && (
+                <div className="mt-4 flex items-center gap-2 p-3 rounded-lg border border-zinc-800 bg-zinc-950">
+                  {isInteractLoading && <Loader2 className="size-4 text-emerald-400 animate-spin" />}
+                  <p className="text-sm text-zinc-300 font-mono break-all">{interactStatus}</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
