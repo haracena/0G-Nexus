@@ -1,0 +1,57 @@
+{
+  "0xf0ca2465418559f35b22518223b4fd2511442eafe3f61eac33d271e7e7c2151a": {
+    "title": "TestQuest DEX: Volume Trading Sprint",
+    "description": "Experience the lightning-fast swaps of the TestQuest AMM. Execute a swap with optimal slippage and contribute to our daily trading volume. Every successful swap verified on-chain earns you an exclusive token bounty!",
+    "targetContract": "0xDC0a238C8f4695Ba89A825E6cA5C92C4B7793acD",
+    "targetEvent": "SwapCompleted",
+    "conditions": {
+      "user": "claimant",
+      "amountIn": "50"
+    },
+    "createdAt": "2026-06-22T14:49:30.337Z"
+  },
+  "0x6050c328898cc6726c25416cb4c664ec541eca2d340db4e620e5751f974e87d1": {
+    "title": "TestQuest DEX: Volume Trading Sprint",
+    "description": "Experience the lightning-fast swaps of the TestQuest AMM. Execute a swap with optimal slippage and contribute to our daily trading volume. Every successful swap verified on-chain earns you an exclusive token bounty!",
+    "targetContract": "0xDC0a238C8f4695Ba89A825E6cA5C92C4B7793acD",
+    "targetEvent": "SwapCompleted",
+    "conditions": {
+      "user": "claimant",
+      "amountIn": "50"
+    },
+    "createdAt": "2026-06-22T14:50:18.737Z"
+  },
+  "0x611f9040289859d7c05c28053d47ecdcbead220a895eb6e4f7e2899d5400c24c": {
+    "title": "TestQuest DEX: Volume Trading Sprint",
+    "description": "Experience the lightning-fast swaps of the TestQuest AMM. Execute a swap with optimal slippage and contribute to our daily trading volume. Every successful swap verified on-chain earns you an exclusive token bounty!",
+    "targetContract": "0xDC0a238C8f4695Ba89A825E6cA5C92C4B7793acD",
+    "targetEvent": "SwapCompleted",
+    "conditions": {
+      "user": "claimant",
+      "amountIn": "50"
+    },
+    "createdAt": "2026-06-22T14:50:46.933Z"
+  },
+  "0xec98f1d004329ed306e746d4a1b675bfbea1c9ea11b2f24ebf2545f14a87637e": {
+    "title": "TestQuest DEX: Volume Trading Sprint",
+    "description": "Experience the lightning-fast swaps of the TestQuest AMM. Execute a swap with optimal slippage and contribute to our daily trading volume. Every successful swap verified on-chain earns you an exclusive token bounty!",
+    "targetContract": "0xDC0a238C8f4695Ba89A825E6cA5C92C4B7793acD",
+    "targetEvent": "SwapCompleted",
+    "conditions": {
+      "user": "claimant",
+      "amountIn": "50"
+    },
+    "createdAt": "2026-06-22T14:52:09.908Z"
+  },
+  "0xe29da071870939a02fc994d28d4fa6d545fddff6da276251ebab12c2f5e6e9f5": {
+    "title": "TestQuest Liquidity Provider: Stake to Earn",
+    "description": "Join the TestQuest ecosystem! Stake your tokens directly into our Vault to help secure the network. As a reward for your commitment and liquidity provision, you will instantly receive A0GI tokens upon completing your stake.",
+    "targetContract": "0xDC0a238C8f4695Ba89A825E6cA5C92C4B7793acD",
+    "targetEvent": "Staked",
+    "conditions": {
+      "user": "claimant",
+      "amount": "100"
+    },
+    "createdAt": "2026-06-22T15:06:18.169Z"
+  }
+}

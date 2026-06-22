@@ -207,7 +207,7 @@ function AdminCampaignCard({
             className={buttonVariants({
               variant: "default",
               size: "sm",
-              className: "bg-white text-black hover:bg-zinc-200 font-bold",
+              className: "bg-white !text-black hover:bg-zinc-200 font-bold",
             })}
           >
             View Stats
@@ -559,7 +559,7 @@ export default function AdminPage() {
                   href="/dashboard"
                   className={buttonVariants({
                     size: "sm",
-                    className: "bg-white text-black hover:bg-zinc-200 font-semibold"
+                    className: "bg-white !text-black hover:bg-zinc-200 font-semibold"
                   })}
                 >
                   <Plus className="size-4 mr-1.5" />

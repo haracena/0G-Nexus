@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useAccount, useReadContract, useReadContracts, useDisconnect } from "wagmi";
+import { useAccount, useReadContract, useReadContracts, useDisconnect, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { formatUnits } from "viem";
 import { NexusAbi } from "@/lib/abis/NexusAbi";
 import { ERC20Abi } from "@/lib/abis/ERC20Abi";
@@ -19,7 +19,8 @@ import {
   CheckCircle2,
   ExternalLink,
   LineChart,
-  Wallet
+  Wallet,
+  Ban
 } from "lucide-react";
 import {
   AreaChart,
@@ -52,12 +53,32 @@ export default function CampaignStatsPage() {
   const { disconnect } = useDisconnect();
 
   // 1. Fetch Campaign Data
-  const { data: campaignRaw, isLoading: isLoadingCampaign } = useReadContract({
+  const { data: campaignRaw, isLoading: isLoadingCampaign, refetch: refetchCampaign } = useReadContract({
     address: NEXUS_CONTRACT,
     abi: NexusAbi,
     functionName: "campaigns",
     args: [BigInt(campaignId)],
   });
+
+  const { writeContract, data: cancelTxHash, isPending: isCanceling } = useWriteContract();
+  const { isLoading: isCancelConfirming, isSuccess: isCancelSuccess } = useWaitForTransactionReceipt({
+    hash: cancelTxHash,
+  });
+
+  useEffect(() => {
+    if (isCancelSuccess) {
+      refetchCampaign();
+    }
+  }, [isCancelSuccess, refetchCampaign]);
+
+  const handleCancelCampaign = () => {
+    writeContract({
+      address: NEXUS_CONTRACT,
+      abi: NexusAbi,
+      functionName: "cancelCampaign",
+      args: [BigInt(campaignId)],
+    });
+  };
 
   const campaign = useMemo(() => {
     if (!campaignRaw) return null;
@@ -395,6 +416,31 @@ export default function CampaignStatsPage() {
                 </span>
               </div>
             </div>
+
+            {/* Cancel Campaign Zone */}
+            {isAuthorized && campaign.isActive && (
+              <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-6 backdrop-blur-md shadow-xl flex flex-col gap-4">
+                <div className="flex items-center gap-2 text-red-400">
+                  <Ban className="size-4" />
+                  <h3 className="font-bold">Danger Zone</h3>
+                </div>
+                <p className="text-sm text-zinc-400">
+                  Canceling the campaign will stop new claims and refund the remaining <strong className="text-zinc-300">{fmtAmount(campaign.remainingReward)} {symbol}</strong> to your wallet.
+                </p>
+                <Button 
+                  variant="destructive" 
+                  className="w-full font-bold"
+                  onClick={handleCancelCampaign}
+                  disabled={isCanceling || isCancelConfirming}
+                >
+                  {isCanceling || isCancelConfirming ? (
+                    <><Loader2 className="size-4 mr-2 animate-spin" /> Processing...</>
+                  ) : (
+                    "Cancel Campaign & Withdraw"
+                  )}
+                </Button>
+              </div>
+            )}
 
           </div>
 

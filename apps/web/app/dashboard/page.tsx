@@ -43,6 +43,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import {
   Loader2,
@@ -98,6 +106,7 @@ export default function Dashboard() {
 
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
@@ -223,8 +232,13 @@ export default function Dashboard() {
     }));
   };
 
-  const handleDeploy = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleReviewClick = () => {
+    const form = document.getElementById("campaign-form") as HTMLFormElement;
+    if (form && !form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
     if (!isConnected) {
       toast.error("Please connect your wallet first.");
       return;
@@ -240,6 +254,11 @@ export default function Dashboard() {
       return;
     }
 
+    setIsConfirmDialogOpen(true);
+  };
+
+  const handleDeploy = async () => {
+    setIsConfirmDialogOpen(false);
     setIsUploading(true);
     setUploadStatus("Uploading metadata to 0G Storage...");
 
@@ -460,7 +479,11 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <form onSubmit={handleDeploy} className="grid gap-8">
+        <form
+          id="campaign-form"
+          onSubmit={(e) => e.preventDefault()}
+          className="grid gap-8"
+        >
           {/* Step 1: App Metadata */}
           {currentStep === 1 && (
             <Card className="border border-white/5 bg-zinc-900/30 backdrop-blur-md shadow-xl rounded-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -1020,7 +1043,7 @@ export default function Dashboard() {
                     />
                   </div>
                 </div>
-                <div className="grid gap-2 max-w-full md:max-w-[388px]">
+                {/* <div className="grid gap-2 max-w-full md:max-w-[388px]">
                   <Label
                     htmlFor="max-claims"
                     className="text-zinc-300 font-medium"
@@ -1040,7 +1063,7 @@ export default function Dashboard() {
                     }
                     className="bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:border-violet-500/50 focus:ring-violet-500/20 transition-all rounded-lg h-11 px-4"
                   />
-                </div>
+                </div> */}
               </CardContent>
             </Card>
           )}
@@ -1067,18 +1090,12 @@ export default function Dashboard() {
               </Button>
             ) : (
               <Button
-                type="submit"
+                type="button"
+                onClick={handleReviewClick}
                 disabled={isUploading}
                 className="bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 text-white font-bold border-0 shadow-lg shadow-violet-500/20 px-8"
               >
-                {isUploading ? (
-                  <>
-                    <Loader2 className="size-5 animate-spin mr-2" />{" "}
-                    Deploying...
-                  </>
-                ) : (
-                  "Upload & Deploy"
-                )}
+                Review Campaign
               </Button>
             )}
           </div>
@@ -1089,16 +1106,92 @@ export default function Dashboard() {
               className="border-emerald-500/20 bg-emerald-500/5 py-4 rounded-xl mt-4"
             >
               <CheckCircle2 className="size-4 text-emerald-400" />
-              <div className="grid gap-0.5">
-                <AlertTitle className="text-emerald-400 font-semibold text-xs uppercase tracking-wider">
-                  Success
-                </AlertTitle>
-                <AlertDescription className="text-emerald-300 text-sm">
-                  {uploadStatus}
-                </AlertDescription>
-              </div>
+              <AlertTitle className="text-emerald-400 font-semibold text-xs uppercase tracking-wider">
+                Success
+              </AlertTitle>
+              <AlertDescription className="text-emerald-300 text-sm">
+                {uploadStatus}
+              </AlertDescription>
             </Alert>
           )}
+
+          {/* Confirmation Dialog */}
+          <Dialog
+            open={isConfirmDialogOpen}
+            onOpenChange={setIsConfirmDialogOpen}
+          >
+            <DialogContent className="bg-zinc-950 border-zinc-800 text-zinc-100 max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-xl">Review Campaign</DialogTitle>
+                <DialogDescription className="text-zinc-400">
+                  Please confirm the details before deploying to the 0G Network.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="grid gap-4 py-4 text-sm">
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="text-zinc-500">Title:</span>
+                  <span className="col-span-2 font-medium">
+                    {campaignData.title || "-"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 items-start gap-4">
+                  <span className="text-zinc-500">Description:</span>
+                  <span className="col-span-2 font-medium text-zinc-300 break-words line-clamp-3">
+                    {campaignData.description || "-"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="text-zinc-500">Category:</span>
+                  <span className="col-span-2 font-medium">
+                    {campaignData.category || "-"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="text-zinc-500">Target Event:</span>
+                  <span className="col-span-2 font-medium text-violet-400">
+                    {selectedEventName}
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="text-zinc-500">Total Reward:</span>
+                  <span className="col-span-2 font-medium">
+                    {campaignData.totalReward} {symbol || "Tokens"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="text-zinc-500">Per Action:</span>
+                  <span className="col-span-2 font-medium">
+                    {campaignData.rewardPerAction} {symbol || "Tokens"}
+                  </span>
+                </div>
+              </div>
+
+              <DialogFooter className="gap-3 sm:gap-0 sm:space-x-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsConfirmDialogOpen(false)}
+                  className="border-zinc-800 text-zinc-300 hover:text-white"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleDeploy}
+                  disabled={isUploading}
+                  className="bg-violet-600 hover:bg-violet-700 text-white"
+                >
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin mr-2" />
+                      Deploying...
+                    </>
+                  ) : (
+                    "Confirm & Deploy"
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </form>
       </main>
     </div>
